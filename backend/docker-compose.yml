@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: diabetic_foot_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: diabetic_foot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d diabetic_foot"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: diabetic_foot_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: diabetic_foot_web
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@db:5432/diabetic_foot
+      - REDIS_URL=redis://redis:6379/0
+      - STORAGE_PROVIDER=local
+      - LOCAL_STORAGE_DIR=/workspace/uploads
+      - JWT_SECRET_KEY=dev_jwt_secret_key_change_me_in_production_12345
+      - JWT_REFRESH_SECRET_KEY=dev_jwt_refresh_secret_key_change_me_in_production_12345
+      - INITIAL_ADMIN_EMAIL=admin@deepvision.org
+      - INITIAL_ADMIN_PASSWORD=AdminSecure123!
+    volumes:
+      - .:/workspace
+      - uploads_volume:/workspace/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  redisdata:
+  uploads_volume:

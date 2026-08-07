@@ -1,0 +1,25 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Node / frontend artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+
+# Local runtime artifacts
+backend/uploads/
+backend/.pytest_cache/
+backend/migration_*.log
+*.log
+
+# Virtual environments
+.venv/
+venv/

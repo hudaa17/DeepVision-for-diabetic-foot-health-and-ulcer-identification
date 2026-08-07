@@ -1,0 +1,5 @@
+{
+  "name": "curavision-workspace",
+  "private": true,
+  "description": "Root workspace configuration for CuraVision"
+}
