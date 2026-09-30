@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: diabetic_foot
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,7 +22,7 @@ services:
     image: redis:7-alpine
     container_name: diabetic_foot_redis
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redisdata:/data
     healthcheck:
@@ -39,7 +39,7 @@ services:
     command: >
       sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@db:5432/diabetic_foot
       - REDIS_URL=redis://redis:6379/0

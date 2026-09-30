@@ -1,0 +1,5 @@
+Grade,Original Test Images,Correct Predictions,Correct + >=90% Confidence,Images Copied,Missing
+Grade 1,44,29,21,21,0
+Grade 2,37,19,15,15,0
+Grade 3,18,8,5,5,0
+Grade 4,42,34,30,30,0

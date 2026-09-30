@@ -4,16 +4,28 @@ from skimage.segmentation import watershed
 from skimage.feature import peak_local_max
 from scipy import ndimage
 
-def run_watershed_segmentation(rgb_image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+def run_watershed_segmentation(rgb_image: np.ndarray, is_healthy: bool = False) -> tuple[np.ndarray, np.ndarray]:
     """
     Perform Watershed Segmentation on a foot image using OpenCV and Scikit-image.
     
     Args:
         rgb_image: ndarray of shape (H, W, 3) in RGB color space.
+        is_healthy: Boolean indicating if the foot is clinically healthy (intact skin, Wagner 0).
     Returns:
         segmented_overlay: ndarray of shape (H, W, 3) - original image with segment boundaries overlaid.
         binary_mask: ndarray of shape (H, W) - binary mask of the segmented regions (255 = target region, 0 = background).
     """
+    if is_healthy:
+        h, w = rgb_image.shape[:2]
+        is_white = (rgb_image[:, :, 0] > 230) & (rgb_image[:, :, 1] > 230) & (rgb_image[:, :, 2] > 230)
+        foot_mask = (~is_white).astype(np.uint8) * 255
+        contours, _ = cv2.findContours(foot_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        segmented_overlay = rgb_image.copy()
+        if contours:
+            cv2.drawContours(segmented_overlay, contours, -1, (16, 185, 129), 3) # Emerald green intact contour
+        binary_mask = np.zeros((h, w), dtype=np.uint8)
+        return segmented_overlay, binary_mask
+
     # 1. Convert to grayscale and blur
     gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)

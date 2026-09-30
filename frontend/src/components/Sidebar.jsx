@@ -1,87 +1,73 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
-import { LayoutDashboard, Users, Upload, Home, Shield, User, Settings, Stethoscope } from 'lucide-react';
-import logo from '../logo.jpg';
+import { 
+  LayoutGrid, 
+  Users, 
+  Scan, 
+  Crosshair, 
+  FileText, 
+  Bot, 
+  BarChart3, 
+  Cpu, 
+  SlidersHorizontal,
+  HelpCircle,
+  LogOut,
+  Stethoscope
+} from 'lucide-react';
+import doctorAvatar from '../assets/doctor_ananya_rao.jpg';
 
 export const Sidebar = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  if (!user) return null;
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (e) {
+      console.error("Logout failed:", e);
+    }
+  };
 
-  const isClinicianOrAdmin = ['clinician', 'admin'].includes(user.role);
-
-  const menuItems = [
-    { path: '/', label: 'Home', icon: <Home size={18} /> },
-    ...(isClinicianOrAdmin ? [
-      { path: '/dashboard', label: 'Dashboard', icon: <LayoutDashboard size={18} /> },
-      { path: '/upload', label: 'Inference Upload', icon: <Upload size={18} /> }
-    ] : []),
-    { path: '/patients', label: 'Patient Registry', icon: <Users size={18} /> },
-    { path: '/doctors', label: 'Clinicians', icon: <Stethoscope size={18} /> },
-    { path: '/profile', label: 'Profile', icon: <User size={18} /> },
-    { path: '/settings', label: 'Settings', icon: <Settings size={18} /> }
+  const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: <LayoutGrid size={18} /> },
+    { path: '/patients', label: 'Patients', icon: <Users size={18} /> },
+    { path: '/upload', label: 'Image Analysis', icon: <Scan size={18} /> },
+    { path: '/predictions/current', label: 'Predictions & Grad-CAM', icon: <Crosshair size={18} /> },
+    { path: '/reports/current', label: 'Reports', icon: <FileText size={18} /> },
+    { path: '#ai-assistant', label: 'AI Assistant', icon: <Bot size={18} />, isAction: true },
+    { path: '/dashboard#analytics', label: 'Analytics', icon: <BarChart3 size={18} /> },
+    { path: '/settings#model', label: 'Model & System', icon: <Cpu size={18} /> },
+    { path: '/settings', label: 'Settings', icon: <SlidersHorizontal size={18} /> }
   ];
 
   return (
-    <aside className="sidebar" style={{
-      width: '260px',
-      backgroundColor: 'var(--color-dark-navy)',
-      display: 'flex',
-      flexDirection: 'column',
-      color: 'var(--color-white)',
-      padding: '32px 16px',
-      height: '100vh',
-      position: 'sticky',
-      top: 0,
-      zIndex: 101,
-      borderRight: '1px solid #1E293B',
-      flexShrink: 0
-    }}>
-      {/* Header Branding */}
-      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '40px', padding: '0 8px' }}>
-        <img src={logo} alt="CuraVision" style={{
-          width: '100%',
-          maxWidth: '180px',
-          borderRadius: '12px',
-          objectFit: 'contain'
-        }} />
+    <aside className="clinical-sidebar">
+      {/* Brand Header */}
+      <div className="sidebar-brand">
+        <div className="brand-icon-box">
+          <Stethoscope size={20} strokeWidth={2.4} />
+        </div>
+        <div className="brand-text-block">
+          <span className="brand-title">CuraVision</span>
+          <span className="brand-subtitle">DEEPVISION AI CDSS</span>
+        </div>
       </div>
 
-      {/* Navigation Links */}
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>
-        {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+      {/* Main Nav Items */}
+      <nav className="sidebar-nav">
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path || 
+            (item.path.startsWith('/predictions') && location.pathname.startsWith('/predictions')) ||
+            (item.path.startsWith('/reports') && location.pathname.startsWith('/reports'));
+
           return (
             <NavLink
-              key={item.path}
+              key={item.label}
               to={item.path}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 16px',
-                borderRadius: '10px',
-                fontSize: '14px',
-                fontWeight: 600,
-                color: isActive ? 'var(--color-white)' : '#94A3B8',
-                backgroundColor: isActive ? 'var(--color-primary)' : 'transparent',
-                transition: 'all var(--transition-fast)',
-                borderLeft: isActive ? '4px solid var(--color-white)' : '4px solid transparent'
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = '#1E293B';
-                  e.currentTarget.style.color = 'var(--color-white)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#94A3B8';
-                }
-              }}
+              className={`sidebar-nav-item ${isActive ? 'active' : ''}`}
             >
               {item.icon}
               <span>{item.label}</span>
@@ -90,24 +76,46 @@ export const Sidebar = () => {
         })}
       </nav>
 
-      {/* Hospital Node / Security Info Footer */}
-      <div style={{
-        marginTop: 'auto',
-        backgroundColor: '#1E293B',
-        padding: '16px',
-        borderRadius: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-        border: '1px solid #334155'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10B981' }}>
-          <Shield size={16} />
-          <span style={{ fontSize: '12px', fontWeight: 600 }}>HIPAA Secured</span>
+      {/* Bottom Footer Section */}
+      <div className="sidebar-footer">
+        <div className="sidebar-help-link">
+          <HelpCircle size={15} />
+          <span>Help & Clinical Support</span>
         </div>
-        <p style={{ fontSize: '10px', color: '#94A3B8', lineHeight: 1.4 }}>
-          This node is running in encrypted clinical sandbox mode. All events are logged.
-        </p>
+
+        {/* System Status Box */}
+        <div className="system-status-box">
+          <div className="status-header">
+            <span>SYSTEM STATUS</span>
+            <span className="status-percent">99.98%</span>
+          </div>
+          <div className="status-indicator-line">
+            <span className="status-live-dot"></span>
+            <span>All inference clusters online</span>
+          </div>
+        </div>
+
+        {/* User Card */}
+        <div className="clinician-profile-card">
+          <img 
+            src={doctorAvatar} 
+            alt="Dr. Ananya Rao" 
+            className="clinician-avatar" 
+          />
+          <div className="clinician-info">
+            <span className="clinician-name">
+              {user?.full_name || 'Dr. Ananya Rao, MD'}
+            </span>
+            <span className="clinician-role">Lead Podiatrist</span>
+          </div>
+          <button 
+            onClick={handleLogout} 
+            className="btn-logout-icon"
+            title="Log out of clinical session"
+          >
+            <LogOut size={16} />
+          </button>
+        </div>
       </div>
     </aside>
   );

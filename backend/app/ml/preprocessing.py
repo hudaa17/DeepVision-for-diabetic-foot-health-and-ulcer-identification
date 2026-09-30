@@ -24,8 +24,8 @@ def preprocess_foot_image(image_bytes: bytes, target_size: tuple = (224, 224)) -
     """
     Complete preprocessing pipeline.
     Returns:
-        1. raw_cv2_image: Original RGB image in array form.
-        2. preprocessed_tensor: Fully preprocessed image scaled for MobileNetV2.
+        1. rgb_img: Original clinical RGB image in array form.
+        2. model_tensor: Float32 RGB tensor of shape (1, 224, 224, 3) ready for model_runner.
     """
     # Load image from bytes using OpenCV
     nparr = np.frombuffer(image_bytes, np.uint8)
@@ -37,17 +37,8 @@ def preprocess_foot_image(image_bytes: bytes, target_size: tuple = (224, 224)) -
     # Convert BGR to RGB
     rgb_img = cv2.cvtColor(bgr_img, cv2.COLOR_BGR2RGB)
     
-    # Apply filters
-    denoised = apply_noise_reduction(rgb_img)
-    enhanced = apply_clahe_contrast_enhancement(denoised)
+    # Resize to model input shape (preserving clinical color distribution for neural network)
+    resized = cv2.resize(rgb_img, target_size, interpolation=cv2.INTER_AREA)
+    model_tensor = np.expand_dims(resized.astype(np.float32), axis=0)
     
-    # Resize to model input shape
-    resized = cv2.resize(enhanced, target_size, interpolation=cv2.INTER_AREA)
-    
-    # Normalize for MobileNetV2: Scale pixels to [-1, 1]
-    normalized = (resized.astype(np.float32) / 127.5) - 1.0
-    
-    # Add batch dimension: shape (1, 224, 224, 3)
-    preprocessed_tensor = np.expand_dims(normalized, axis=0)
-    
-    return rgb_img, preprocessed_tensor
+    return rgb_img, model_tensor

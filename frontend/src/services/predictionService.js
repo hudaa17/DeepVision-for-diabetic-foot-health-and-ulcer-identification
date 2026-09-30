@@ -6,6 +6,17 @@ export const predictionService = {
     return response.data;
   },
 
+  async analyzeUploadedImage(file, patientId = null, patientName = null) {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (patientId) formData.append('patient_id', patientId);
+    if (patientName) formData.append('patient_name', patientName);
+    const response = await api.post('/predictions/analyze-upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
   async getStatus(predictionId) {
     const response = await api.get(`/predictions/status/${predictionId}`);
     return response.data;

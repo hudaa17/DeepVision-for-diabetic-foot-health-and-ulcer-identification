@@ -5,13 +5,16 @@ from app.core.config import settings
 
 class LocalStorage(BaseStorage):
     def __init__(self, base_dir: str = settings.LOCAL_STORAGE_DIR):
-        self.base_dir = base_dir
-        os.makedirs(base_dir, exist_ok=True)
+        self.base_dir = os.path.abspath(base_dir)
+        os.makedirs(self.base_dir, exist_ok=True)
 
     def _get_absolute_path(self, storage_key: str) -> str:
         # Standardize path separators and avoid path traversal attacks
-        cleaned_key = storage_key.lstrip("/")
-        return os.path.abspath(os.path.join(self.base_dir, cleaned_key))
+        cleaned_key = str(storage_key).strip().lstrip("/\\").replace("\\", "/")
+        dest_path = os.path.abspath(os.path.join(self.base_dir, cleaned_key))
+        if not dest_path.lower().startswith(self.base_dir.lower()):
+            raise PermissionError(f"Access denied: path traversal detected for key {storage_key}")
+        return dest_path
 
     async def upload_file(self, file_data: bytes, storage_key: str, content_type: str = "application/octet-stream") -> str:
         dest_path = self._get_absolute_path(storage_key)

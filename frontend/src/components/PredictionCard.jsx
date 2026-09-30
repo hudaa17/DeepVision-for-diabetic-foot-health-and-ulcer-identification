@@ -15,15 +15,17 @@ export const PredictionCard = ({ prediction }) => {
   });
 
   const getRiskBadge = (risk) => {
-    switch (risk) {
-      case 'normal':
-        return <span className="badge badge-normal">Normal Risk</span>;
-      case 'mild':
-        return <span className="badge badge-mild">Mild Risk</span>;
-      case 'severe':
-        return <span className="badge badge-severe">Severe Risk</span>;
-      default:
-        return <span className="badge" style={{ backgroundColor: '#F1F5F9', color: 'var(--color-text-secondary)' }}>Unknown</span>;
+    const r = (risk || '').toLowerCase();
+    if (r.includes('grade 4') || r === 'severe') {
+      return <span className="badge badge-severe">Grade 4 (Severe)</span>;
+    } else if (r.includes('grade 3')) {
+      return <span className="badge badge-severe">Grade 3 (High)</span>;
+    } else if (r.includes('grade 2') || r === 'mild') {
+      return <span className="badge badge-mild">Grade 2 (Mild)</span>;
+    } else if (r.includes('grade 1') || r === 'normal') {
+      return <span className="badge badge-normal">Grade 1 (Low)</span>;
+    } else {
+      return <span className="badge" style={{ backgroundColor: '#F1F5F9', color: 'var(--color-text-secondary)' }}>{risk || 'Unknown'}</span>;
     }
   };
 

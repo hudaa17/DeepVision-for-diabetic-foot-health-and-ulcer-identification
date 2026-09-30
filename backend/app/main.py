@@ -4,7 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 import uvicorn
 
 from app.core.config import settings
-from app.core.database import engine, Base, AsyncSessionLocal
+from app.core.database import engine, Base, AsyncSessionLocal, init_db
 from app.core.logging_config import setup_logging
 from app.core.security import get_password_hash
 from app.models.user import User
@@ -81,6 +81,9 @@ async def health_check():
 async def startup_event():
     logger.info("Starting up FastAPI application...")
     
+    # 0. Initialize Database Tables
+    await init_db()
+
     # 1. Connect to Redis
     await redis_service.connect()
 
@@ -120,6 +123,23 @@ async def startup_event():
                 db.add(new_clin)
                 await db.commit()
                 logger.info("Clinician user successfully seeded.")
+
+            # Seed Dr. Ananya Rao account
+            rao_email = "dr.rao@hospital.org"
+            result_rao = await db.execute(select(User).filter(User.email == rao_email))
+            rao = result_rao.scalars().first()
+            if not rao:
+                logger.info(f"Seeding Dr. Rao clinician account: {rao_email}...")
+                new_rao = User(
+                    email=rao_email,
+                    hashed_password=get_password_hash("AdminSecure123!"),
+                    full_name="Dr. Ananya Rao, MD",
+                    role="clinician",
+                    is_active=True
+                )
+                db.add(new_rao)
+                await db.commit()
+                logger.info("Dr. Rao account successfully seeded.")
                 
             # Seed default patient
             patient_email = "patient@curavision.org"

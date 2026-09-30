@@ -19,6 +19,13 @@ backend/uploads/
 backend/.pytest_cache/
 backend/migration_*.log
 *.log
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
 
 # Virtual environments
 .venv/

@@ -24,7 +24,14 @@ class PredictionResponse(PredictionBase):
     model_config = ConfigDict(from_attributes=True)
 
 class PredictionStatusResponse(BaseModel):
-    id: uuid.UUID
+    id: Optional[uuid.UUID] = None
+    prediction_id: Optional[uuid.UUID] = None
     status: str
+
+    
+    progress: Optional[int] = 0
+    message: Optional[str] = None
     risk_level: Optional[str] = None
     confidence_score: Optional[float] = None
+
+    model_config = ConfigDict(extra="ignore")

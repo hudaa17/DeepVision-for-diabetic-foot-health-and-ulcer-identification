@@ -124,16 +124,17 @@ class PredictionService:
                 # Load ML Model and Predict
                 await self._update_pipeline_status(prediction_id, "processing", 70, "Running MobileNetV2 model inference...")
                 
-                # Model predict takes preprocessed tensor of shape (1, 224, 224, 3)
+                # Model predict takes preprocessed tensor or rgb image
                 risk_level, confidence, probabilities = model_runner.predict(preprocessed_tensor)
 
                 # Generate Grad-CAM Heatmap
                 await self._update_pipeline_status(prediction_id, "processing", 85, "Generating explainability heatmaps (Grad-CAM)...")
                 
                 model_runner.load()
+                heatmap_tensor = model_runner.prepare_tensor(preprocessed_tensor)
                 heatmap_img = generate_gradcam_heatmap(
                     model=model_runner.model,
-                    preprocessed_tensor=preprocessed_tensor,
+                    preprocessed_tensor=heatmap_tensor,
                     original_rgb_image=rgb_img
                 )
                 
@@ -147,7 +148,14 @@ class PredictionService:
                 )
 
                 # Retrieve Care Recommendations
-                recommendations = get_recommendations_for_risk(risk_level)
+                recommendations = dict(get_recommendations_for_risk(risk_level))
+                # Store full per-class probabilities breakdown
+                class_probs = {
+                    model_runner.class_labels[i] if i < len(model_runner.class_labels) else f"class_{i}": float(p)
+                    for i, p in enumerate(probabilities)
+                }
+                recommendations["class_probabilities"] = class_probs
+                recommendations["segmented_storage_key"] = segmented_key
 
                 # Save results to DB
                 pred_result = await db.execute(select(Prediction).filter(Prediction.id == prediction_id))
@@ -156,9 +164,18 @@ class PredictionService:
                     prediction.status = "completed"
                     prediction.risk_level = risk_level
                     prediction.confidence_score = confidence
-                    prediction.probability_normal = probabilities[0]
-                    prediction.probability_mild = probabilities[1]
-                    prediction.probability_severe = probabilities[2]
+                    if len(probabilities) == 4:
+                        prediction.probability_normal = float(probabilities[0])
+                        prediction.probability_mild = float(probabilities[1])
+                        prediction.probability_severe = float(probabilities[2] + probabilities[3])
+                    elif len(probabilities) >= 3:
+                        prediction.probability_normal = float(probabilities[0])
+                        prediction.probability_mild = float(probabilities[1])
+                        prediction.probability_severe = float(probabilities[2])
+                    else:
+                        prediction.probability_normal = float(probabilities[0])
+                        prediction.probability_mild = 0.0
+                        prediction.probability_severe = float(probabilities[-1])
                     prediction.heatmap_storage_key = heatmap_key
                     prediction.recommendations = recommendations
                     

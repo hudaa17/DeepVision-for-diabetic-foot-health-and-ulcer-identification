@@ -16,7 +16,7 @@ class Settings(BaseSettings):
 
     # Database Configuration
     DATABASE_URL: str = Field(
-        default="postgresql+asyncpg://postgres:postgrespassword@localhost:5432/diabetic_foot"
+        default="sqlite+aiosqlite:///./diabetic_foot.db"
     )
     DB_POOL_SIZE: int = 20
     DB_MAX_OVERFLOW: int = 10
@@ -40,6 +40,7 @@ class Settings(BaseSettings):
 
     # Local Storage Settings
     LOCAL_STORAGE_DIR: str = Field(default="./uploads")
+    MODEL_PATH: Optional[str] = Field(default=None)
 
     # AWS S3 Settings
     AWS_ACCESS_KEY_ID: Optional[str] = None

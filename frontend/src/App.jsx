@@ -45,9 +45,15 @@ export const AuthProvider = ({ children }) => {
           setUser(profile);
           localStorage.setItem('user', JSON.stringify(profile));
         } catch (error) {
-          console.error("Token validation failed:", error);
-          authService.logout();
-          setUser(null);
+          console.warn("Token validation failed or server starting:", error);
+          if (error.response?.status === 401) {
+            authService.logout();
+            setUser(null);
+          } else {
+            // Retain cached user session while server is connecting
+            const cached = authService.getUser();
+            if (cached) setUser(cached);
+          }
         }
       } else {
         setUser(null);
@@ -158,6 +164,11 @@ const AppLayout = () => {
           <Route path="/upload" element={
             <PrivateRoute roles={['clinician', 'admin']}>
               <Upload />
+            </PrivateRoute>
+          } />
+          <Route path="/predictions" element={
+            <PrivateRoute roles={['clinician', 'admin', 'patient']}>
+              <Prediction />
             </PrivateRoute>
           } />
           <Route path="/predictions/:id" element={

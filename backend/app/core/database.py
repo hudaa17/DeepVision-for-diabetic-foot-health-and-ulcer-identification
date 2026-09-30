@@ -3,14 +3,13 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
-# Create async engine for PostgreSQL connection
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    pool_size=settings.DB_POOL_SIZE,
-    max_overflow=settings.DB_MAX_OVERFLOW,
-    future=True
-)
+# Create async engine with appropriate pool parameters
+engine_kwargs = {"echo": settings.DEBUG, "future": True}
+if "sqlite" not in settings.DATABASE_URL:
+    engine_kwargs["pool_size"] = settings.DB_POOL_SIZE
+    engine_kwargs["max_overflow"] = settings.DB_MAX_OVERFLOW
+
+engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
 
 # Create async session maker
 AsyncSessionLocal = async_sessionmaker(
@@ -24,6 +23,11 @@ AsyncSessionLocal = async_sessionmaker(
 # Declarative Base class for models
 class Base(DeclarativeBase):
     pass
+
+async def init_db():
+    """Ensure all database schema tables exist on application startup."""
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
 # FastAPI Dependency for obtaining an AsyncSession
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

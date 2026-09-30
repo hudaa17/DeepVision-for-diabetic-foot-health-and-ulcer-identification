@@ -9,15 +9,16 @@ WORKDIR /workspace
 # Install system dependencies needed for OpenCV, psutil, etc.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    libgl1-mesa-glx \
+    libgl1 \
     libglib2.0-0 \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy and install dependencies
-COPY requirements.txt .
+COPY requirements.txt requirements-ml.txt ./
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
+RUN pip install -r requirements-ml.txt
 
 # Copy application code
 COPY . .
