@@ -1,0 +1,12 @@
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = [
+    "E501",  # line too long
+    "E712",  # comparison to True in SQLAlchemy filters
+    "F401",  # imported but unused (common in re-exports and API routers)
+    "F841",  # local variable assigned but never used
+]

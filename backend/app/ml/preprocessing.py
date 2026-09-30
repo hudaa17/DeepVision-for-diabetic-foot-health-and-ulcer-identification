@@ -10,11 +10,11 @@ def apply_clahe_contrast_enhancement(image: np.ndarray) -> np.ndarray:
     """Apply Contrast Limited Adaptive Histogram Equalization (CLAHE) on LAB color space."""
     # Convert image from RGB (expected input) to LAB color space
     lab = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)
-    l, a, b = cv2.split(lab)
+    l_chan, a, b = cv2.split(lab)
     
     # Create CLAHE object
     clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
-    cl = clahe.apply(l)
+    cl = clahe.apply(l_chan)
     
     # Merge and convert back to RGB
     limg = cv2.merge((cl, a, b))

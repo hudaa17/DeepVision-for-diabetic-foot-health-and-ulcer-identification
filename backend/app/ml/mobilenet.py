@@ -250,7 +250,10 @@ class MobileNetV2Model:
             foot_mask = skin_mask.astype(np.uint8)
             if np.mean(foot_mask) < 0.15:
                 foot_mask = np.ones_like(gray, dtype=np.uint8)
-                foot_mask[:10, :] = 0; foot_mask[-10:, :] = 0; foot_mask[:, :10] = 0; foot_mask[:, -10:] = 0
+                foot_mask[:10, :] = 0
+                foot_mask[-10:, :] = 0
+                foot_mask[:, :10] = 0
+                foot_mask[:, -10:] = 0
 
         foot_pixels = max(1, np.sum(foot_mask > 0))
         nec_strict = float(np.sum((gray < 35) & (hsv[:, :, 1] < 80) & (foot_mask > 0)) / foot_pixels)

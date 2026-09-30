@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-level: '3.12'
+          python-version: '3.12'
           
       - name: Install Ruff
         run: pip install ruff
@@ -61,11 +61,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Install from backend requirements
           pip install -r backend/requirements.txt
           
       - name: Run Pytest
         env:
+          PYTHONPATH: backend
           DATABASE_URL: postgresql+asyncpg://postgres:postgrespassword@localhost:5432/diabetic_foot_test
           REDIS_URL: redis://localhost:6379/0
           STORAGE_PROVIDER: local
@@ -73,4 +73,4 @@ jobs:
           JWT_SECRET_KEY: test_secret_access_key_12345
           JWT_REFRESH_SECRET_KEY: test_secret_refresh_key_12345
         run: |
-          pytest backend/tests/
+          pytest -v backend/tests/

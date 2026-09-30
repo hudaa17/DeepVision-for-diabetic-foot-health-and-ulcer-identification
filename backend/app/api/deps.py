@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # Define oauth2 security scheme pointing to our login route
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl=f"/api/v1/auth/login"
+    tokenUrl="/api/v1/auth/login"
 )
 
 async def get_current_user(

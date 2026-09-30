@@ -77,9 +77,6 @@ async def get_prediction_status(
             status_data["id"] = str(id)
     return status_data
 
-import os
-import json
-
 def load_test_dataset_manifest() -> List[dict]:
     candidates = [
         os.path.abspath(os.path.join(os.getcwd(), "..", "frontend", "src", "data", "testDatasetManifest.json")),
