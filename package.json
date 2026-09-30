@@ -1,5 +1,13 @@
 {
   "name": "curavision-workspace",
   "private": true,
-  "description": "Root workspace configuration for CuraVision"
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=frontend && node -e \"const fs=require('fs'); fs.cpSync('frontend/dist', 'dist', {recursive: true});\"",
+    "dev": "npm run dev --workspace=frontend",
+    "preview": "npm run preview --workspace=frontend"
+  }
 }

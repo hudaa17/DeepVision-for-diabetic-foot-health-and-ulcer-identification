@@ -1,0 +1,16 @@
+Image,Actual Grade,Predicted Grade,Confidence (%),Correct
+ulcers_before_jpg.rf.0957217276154e5f4ff21076dfa65c57.jpg,Grade 2,Grade 2,99.99953,True
+261_jpg.rf.31f0f74e266ad337ec6b1befba6ee56c.jpg,Grade 2,Grade 2,99.99938,True
+303310_jpg.rf.2501f414a9490b08b846914b6f660d96.jpg,Grade 2,Grade 2,99.241745,True
+images-8-_jpg.rf.12eb171f8f208f2aa9aed71add942742.jpg,Grade 2,Grade 2,99.998405,True
+306142_jpg.rf.e72e573b0c85bd6e47c4af58c622ae9d.jpg,Grade 2,Grade 2,99.53072,True
+7_jpg.rf.9d42721e5267dd74b9b4a62dce8d7373.jpg,Grade 2,Grade 2,99.996735,True
+259_jpg.rf.a3a0e308c4b7550a84b468578ac8fc94.jpg,Grade 2,Grade 2,99.99644,True
+29_jpg.rf.8e7a7900343ab80324ab3bf27d4dc7d7.jpg,Grade 2,Grade 2,99.99996,True
+301670_jpg.rf.72d24ad023dba9d20c0643245bfbed6d.jpg,Grade 2,Grade 2,99.91474,True
+303100_jpg.rf.9af0c8e17926ba2200c7e0768eb463eb.jpg,Grade 2,Grade 2,93.23879,True
+305512_jpg.rf.80cf97a30fa53f71d3ab4c45c9f0c9e1.jpg,Grade 2,Grade 2,95.29626,True
+303344_jpg.rf.05e170d6aab45a5bc3bf189ab5926b0b.jpg,Grade 2,Grade 2,94.56218,True
+303416_jpg.rf.6e38ffe71ae97be9aec2eef9bc0e661c.jpg,Grade 2,Grade 2,98.84778,True
+301891_jpg.rf.f003423adbafabf9394f4b6759a732f8.jpg,Grade 2,Grade 2,99.999985,True
+hallux-IPJ-ulcer-post1A_jpg.rf.28b53bd7593108443278b8a517d8c5c6.jpg,Grade 2,Grade 2,99.99949,True
